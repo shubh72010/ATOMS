@@ -5,48 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ATØMS</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      background: #000;
-      height: 100%;
+      background: #111;
+      color: #eee;
+      font-family: monospace;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      color: white;
-      font-family: sans-serif;
+      padding: 2rem;
     }
-    #canvas {
+    canvas {
       max-width: 100%;
-      max-height: 100%;
-    }
-    #controls {
-      margin-top: 10px;
+      border-radius: 12px;
+      margin-top: 1rem;
     }
     input[type="file"] {
-      background: none;
-      border: 1px solid white;
-      color: white;
-      padding: 6px;
-      border-radius: 6px;
+      margin-bottom: 1rem;
     }
     button {
-      margin-left: 10px;
-      padding: 6px 12px;
-      background: white;
-      color: black;
-      border: none;
-      border-radius: 6px;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: #222;
+      border: 1px solid #444;
+      color: white;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <h1>ATØMS</h1>
+  <input type="file" id="upload" accept="image/*">
   <canvas id="canvas"></canvas>
-  <div id="controls">
-    <input type="file" id="upload" accept="image/*"/>
-    <button onclick="download()">Download</button>
-  </div>
+  <button id="download">Download</button>
+
   <script src="app.js"></script>
 </body>
 </html>

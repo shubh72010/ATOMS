@@ -1,41 +1,46 @@
-const upload = document.getElementById('upload');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const download = document.getElementById('download');
-let img, anim;
+const input = document.getElementById("imageInput");
+const dropZone = document.getElementById("drop-zone");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-upload.addEventListener('change', () => {
-  const file = upload.files[0]; if (!file) return;
-  img = new Image();
-  img.onload = initAnimation;
-  img.src = URL.createObjectURL(file);
+dropZone.addEventListener("click", () => input.click());
+
+input.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) handleImage(file);
 });
 
-function initAnimation(){
-  const ratio = img.width / img.height;
-  const width = 1080;
-  const height = width / ratio;
-  canvas.width = width; canvas.height = height;
-  let scale = 1.0;
-  cancelAnimationFrame(anim);
-  function drawFrame(){
-    scale += 0.0004;
-    ctx.setTransform(scale, 0, 0, scale, width*(1-scale)/2, height*(1-scale)/2);
-    ctx.filter = 'blur(40px) brightness(1.1) saturate(1.2)';
-    ctx.drawImage(img, 0, 0, width, height);
-    ctx.setTransform(1,0,0,1,0,0);
-    ctx.filter = 'none';
-    ctx.fillStyle = 'rgba(255,255,255,0.03)';
-    ctx.fillRect(0, 0, width, height);
-    anim = requestAnimationFrame(drawFrame);
-  }
-  drawFrame();
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.style.borderColor = "#888";
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.style.borderColor = "#444";
+});
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.style.borderColor = "#444";
+  const file = e.dataTransfer.files[0];
+  if (file) handleImage(file);
+});
+
+function handleImage(file) {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Apply Atmos effect
+      ctx.filter = "blur(15px) brightness(1.3) saturate(1.2)";
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      ctx.filter = "none";
+      ctx.drawImage(img, 50, 50, 200, 200); // unblurred center portion
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
-
-download.addEventListener('click', ()=>{
-  cancelAnimationFrame(anim);
-  const a = document.createElement('a');
-  a.download = 'atom­s-wallpaper.png';
-  a.href = canvas.toDataURL();
-  a.click();
-});

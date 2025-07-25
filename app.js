@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Preset values adjusted to emphasize stronger initial distortion and noise
         // before blur, based on your theory.
         blurRadiusSlider.value = 35; // Still strong blur, but perhaps slightly less if initial distortion/noise handles some "haze"
-        saturationSlider.value = 5; // Very desaturated
+        saturationSlider.value = 91; // Very desaturated
         tintOpacitySlider.value = 40; // More noticeable tint
         tintColorPicker.value = "#222222"; // A very dark gray/near black tint for depth
         noiseIntensitySlider.value = 30; // Stronger noise for a more pronounced grain

@@ -1,44 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ATØMS</title>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      color: #eee;
-      font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-    }
-    canvas {
-      max-width: 100%;
-      border-radius: 12px;
-      margin-top: 1rem;
-    }
-    input[type="file"] {
-      margin-bottom: 1rem;
-    }
-    button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      background: #222;
-      border: 1px solid #444;
-      color: white;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nothing OS Atmosphere Image Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic Resets & Global Styles */
+        :root {
+            --bg-color-dark: #1a1a1a;
+            --container-bg: #2a2a2a;
+            --text-light: #e0e0e0;
+            --text-lighter: #ffffff;
+            --accent-color: #ffffff; /* White accents for interactive elements */
+            --border-color: #3a3a3a;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--text-lighter);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Container Styling */
+        .container {
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            box-sizing: border-box;
+        }
+
+        /* Input Section (Upload & Canvas) */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--accent-color);
+            color: var(--bg-color-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-file-upload:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        .custom-file-upload:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        #imageUpload {
+            display: none; /* Hide the actual file input */
+        }
+
+        #mainCanvas {
+            background-color: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+            display: block; /* Remove extra space below canvas */
+        }
+
+        /* Loading Spinner */
+        #loadingSpinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Controls Section */
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .control-group {
+            background-color: #333333;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #444;
+        }
+
+        .control-group label {
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+
+        .control-group span {
+            color: var(--accent-color);
+            min-width: 40px; /* Ensure value display has enough space */
+            text-align: right;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #555;
+            outline: none;
+            border-radius: 5px;
+            transition: opacity .2s;
+            margin-top: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 25px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 4px;
+            vertical-align: middle;
+            padding: 0;
+            margin-left: auto; /* Push to the right */
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        input[type="color"]::-moz-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-moz-color-swatch {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+
+        /* Download Button */
+        #downloadBtn {
+            display: block;
+            width: fit-content;
+            margin: 0 auto;
+            padding: 12px 30px;
+            background-color: var(--accent-color);
+            color: var(--bg-color-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-decoration: none; /* For download link functionality */
+            text-align: center;
+        }
+
+        #downloadBtn:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        #downloadBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            .controls-section {
+                grid-template-columns: 1fr; /* Stack controls on small screens */
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>ATØMS</h1>
-  <input type="file" id="upload" accept="image/*">
-  <canvas id="canvas"></canvas>
-  <button id="download">Download</button>
+    <h1>Nothing OS Atmosphere Image Converter</h1>
 
-  <script src="app.js"></script>
+    <div class="container">
+        <div class="input-section">
+            <label for="imageUpload" class="custom-file-upload">Click to Upload Image</label>
+            <input type="file" id="imageUpload" accept="image/*">
+            <canvas id="mainCanvas"></canvas>
+            <div id="loadingSpinner"></div>
+        </div>
+
+        <div class="controls-section">
+            <div class="control-group">
+                <label for="blurRadius">Blur Radius: <span id="blurValue">10</span></label>
+                <input type="range" id="blurRadius" min="0" max="50" value="10">
+            </div>
+
+            <div class="control-group">
+                <label for="saturation">Saturation: <span id="saturationValue">100%</span></label>
+                <input type="range" id="saturation" min="0" max="200" value="100">
+            </div>
+
+            <div class="control-group">
+                <label for="tintOpacity">Tint Opacity: <span id="tintOpacityValue">20%</span></label>
+                <input type="range" id="tintOpacity" min="0" max="100" value="20">
+            </div>
+
+            <div class="control-group">
+                <label for="tintColor">Tint Color:</label>
+                <input type="color" id="tintColor" value="#000000">
+            </div>
+        </div>
+
+        <button id="downloadBtn">Download Image</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/flozz/StackBlur@master/dist/stackblur.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Element References ---
+            const imageUpload = document.getElementById('imageUpload');
+            const mainCanvas = document.getElementById('mainCanvas');
+            const ctx = mainCanvas.getContext('2d');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            const blurRadiusSlider = document.getElementById('blurRadius');
+            const blurValueSpan = document.getElementById('blurValue');
+            const saturationSlider = document.getElementById('saturation');
+            const saturationValueSpan = document.getElementById('saturationValue');
+            const tintOpacitySlider = document.getElementById('tintOpacity');
+            const tintOpacityValueSpan = document.getElementById('tintOpacityValue');
+            const tintColorPicker = document.getElementById('tintColor');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            // --- Global Variables ---
+            let originalImage = null;
+            const MAX_IMAGE_DIMENSION = 1200; // Max dimension for performance optimization
+
+            // --- Utility Function: Show/Hide Loading Spinner ---
+            function showLoadingSpinner(show) {
+                loadingSpinner.style.display = show ? 'block' : 'none';
+            }
+
+            // --- Core Image Processing Logic ---
+            function applyAtmosphereEffect() {
+                if (!originalImage) {
+                    return; // No image loaded yet
+                }
+
+                showLoadingSpinner(true);
+
+                // Clear the canvas before redrawing
+                ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+
+                // Calculate dimensions for drawing, scaling down if too large
+                let drawWidth = originalImage.width;
+                let drawHeight = originalImage.height;
+
+                if (drawWidth > MAX_IMAGE_DIMENSION || drawHeight > MAX_IMAGE_DIMENSION) {
+                    if (drawWidth > drawHeight) {
+                        drawHeight = Math.round(drawHeight * (MAX_IMAGE_DIMENSION / drawWidth));
+                        drawWidth = MAX_IMAGE_DIMENSION;
+                    } else {
+                        drawWidth = Math.round(drawWidth * (MAX_IMAGE_DIMENSION / drawHeight));
+                        drawHeight = MAX_IMAGE_DIMENSION;
+                    }
+                }
+
+                // Set canvas dimensions
+                mainCanvas.width = drawWidth;
+                mainCanvas.height = drawHeight;
+
+                // Draw the original image onto the canvas (without filters initially)
+                ctx.filter = 'none'; // Reset filter before drawing original
+                ctx.drawImage(originalImage, 0, 0, drawWidth, drawHeight);
+
+                // Retrieve control values
+                const blurRadius = parseInt(blurRadiusSlider.value);
+                const saturation = parseInt(saturationSlider.value);
+                const tintOpacity = parseInt(tintOpacitySlider.value) / 100; // Convert to 0-1 range
+                const tintColor = tintColorPicker.value;
+
+                // Apply Blur using StackBlur.js (modifies canvas directly)
+                if (blurRadius > 0) {
+                    StackBlur.canvasRGBA(mainCanvas, 0, 0, mainCanvas.width, mainCanvas.height, blurRadius);
+                }
+
+                // Apply Saturation using CSS filter
+                // We need to redraw the canvas content *after* setting the filter
+                // because filters apply to what's drawn *next*, not what's already there.
+                ctx.filter = `saturate(${saturation}%)`;
+                ctx.drawImage(mainCanvas, 0, 0, mainCanvas.width, mainCanvas.height);
+                ctx.filter = 'none'; // Reset filter immediately after applying to prevent affecting tint
+
+                // Apply Color Tint Overlay
+                if (tintOpacity > 0) {
+                    ctx.globalAlpha = tintOpacity; // Set the opacity for the tint layer
+                    ctx.globalCompositeOperation = 'color'; // Blending mode for tinting
+
+                    ctx.fillStyle = tintColor; // Set the tint color
+                    ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height); // Draw tint rectangle over entire canvas
+
+                    // IMPORTANT: Reset globalCompositeOperation and globalAlpha immediately!
+                    ctx.globalCompositeOperation = 'source-over'; // Reset to default
+                    ctx.globalAlpha = 1; // Reset to full opacity
+                }
+
+                // Update Download Link
+                downloadBtn.href = mainCanvas.toDataURL('image/png');
+                downloadBtn.download = 'atmosphere-image.png';
+
+                showLoadingSpinner(false);
+            }
+
+            // --- Event Listeners ---
+
+            // Image Upload Handler
+            imageUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    showLoadingSpinner(true);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            originalImage = img;
+                            applyAtmosphereEffect();
+                        };
+                        img.onerror = () => {
+                            alert('Could not load image. Please ensure it is a valid image file.');
+                            showLoadingSpinner(false);
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Control Sliders and Color Picker
+            blurRadiusSlider.addEventListener('input', () => {
+                blurValueSpan.textContent = blurRadiusSlider.value;
+                applyAtmosphereEffect();
+            });
+
+            saturationSlider.addEventListener('input', () => {
+                saturationValueSpan.textContent = `${saturationSlider.value}%`;
+                applyAtmosphereEffect();
+            });
+
+            tintOpacitySlider.addEventListener('input', () => {
+                tintOpacityValueSpan.textContent = `${tintOpacitySlider.value}%`;
+                applyAtmosphereEffect();
+            });
+
+            tintColorPicker.addEventListener('input', () => {
+                applyAtmosphereEffect();
+            });
+
+            // --- Initial UI State ---
+            // Set initial display values for sliders
+            blurValueSpan.textContent = blurRadiusSlider.value;
+            saturationValueSpan.textContent = `${saturationSlider.value}%`;
+            tintOpacityValueSpan.textContent = `${tintOpacitySlider.value}%`;
+        });
+    </script>
 </body>
 </html>

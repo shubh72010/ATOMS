@@ -239,14 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listener for Preset Button
     loadPresetBtn.addEventListener('click', () => {
-        // Set slider values to the preset
-        blurRadiusSlider.value = 41;
-        saturationSlider.value = 1;
-        tintOpacitySlider.value = 0;
-        tintColorPicker.value = "#000000";
-        noiseIntensitySlider.value = 17;
-        distortionAmplitudeSlider.value = 30;
-        distortionFrequencySlider.value = 1;
+        // Set slider values to the REVISED preset
+        blurRadiusSlider.value = 45; // Increased blur for stronger haze
+        saturationSlider.value = 10; // More desaturated
+        tintOpacitySlider.value = 30; // Subtle dark tint
+        tintColorPicker.value = "#000000"; // Black tint color
+        noiseIntensitySlider.value = 20; // Slightly more noise
+        distortionAmplitudeSlider.value = 25; // Slightly less wavy
+        distortionFrequencySlider.value = 5; // Fewer, broader waves
 
         // Update the displayed values
         blurValueSpan.textContent = blurRadiusSlider.value;

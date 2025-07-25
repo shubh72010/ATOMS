@@ -286,160 +286,27 @@
                 <label for="tintColor">Tint Color:</label>
                 <input type="color" id="tintColor" value="#000000">
             </div>
-        </div>
+
+            <div class="control-group">
+                <label for="noiseIntensity">Noise Intensity: <span id="noiseValue">0</span></label>
+                <input type="range" id="noiseIntensity" min="0" max="100" value="0">
+            </div>
+
+            <div class="control-group">
+                <label for="distortionAmplitude">Distortion Amplitude: <span id="distortionAmplitudeValue">0</span></label>
+                <input type="range" id="distortionAmplitude" min="0" max="50" value="0">
+            </div>
+
+            <div class="control-group">
+                <label for="distortionFrequency">Distortion Frequency: <span id="distortionFrequencyValue">10</span></label>
+                <input type="range" id="distortionFrequency" min="1" max="100" value="10">
+            </div>
+            </div>
 
         <button id="downloadBtn">Download Image</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/gh/flozz/StackBlur@master/dist/stackblur.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Element References ---
-            const imageUpload = document.getElementById('imageUpload');
-            const mainCanvas = document.getElementById('mainCanvas');
-            const ctx = mainCanvas.getContext('2d');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-
-            const blurRadiusSlider = document.getElementById('blurRadius');
-            const blurValueSpan = document.getElementById('blurValue');
-            const saturationSlider = document.getElementById('saturation');
-            const saturationValueSpan = document.getElementById('saturationValue');
-            const tintOpacitySlider = document.getElementById('tintOpacity');
-            const tintOpacityValueSpan = document.getElementById('tintOpacityValue');
-            const tintColorPicker = document.getElementById('tintColor');
-            const downloadBtn = document.getElementById('downloadBtn');
-
-            // --- Global Variables ---
-            let originalImage = null;
-            const MAX_IMAGE_DIMENSION = 1200; // Max dimension for performance optimization
-
-            // --- Utility Function: Show/Hide Loading Spinner ---
-            function showLoadingSpinner(show) {
-                loadingSpinner.style.display = show ? 'block' : 'none';
-            }
-
-            // --- Core Image Processing Logic ---
-            function applyAtmosphereEffect() {
-                if (!originalImage) {
-                    return; // No image loaded yet
-                }
-
-                showLoadingSpinner(true);
-
-                // Clear the canvas before redrawing
-                ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-
-                // Calculate dimensions for drawing, scaling down if too large
-                let drawWidth = originalImage.width;
-                let drawHeight = originalImage.height;
-
-                if (drawWidth > MAX_IMAGE_DIMENSION || drawHeight > MAX_IMAGE_DIMENSION) {
-                    if (drawWidth > drawHeight) {
-                        drawHeight = Math.round(drawHeight * (MAX_IMAGE_DIMENSION / drawWidth));
-                        drawWidth = MAX_IMAGE_DIMENSION;
-                    } else {
-                        drawWidth = Math.round(drawWidth * (MAX_IMAGE_DIMENSION / drawHeight));
-                        drawHeight = MAX_IMAGE_DIMENSION;
-                    }
-                }
-
-                // Set canvas dimensions
-                mainCanvas.width = drawWidth;
-                mainCanvas.height = drawHeight;
-
-                // Draw the original image onto the canvas (without filters initially)
-                ctx.filter = 'none'; // Reset filter before drawing original
-                ctx.drawImage(originalImage, 0, 0, drawWidth, drawHeight);
-
-                // Retrieve control values
-                const blurRadius = parseInt(blurRadiusSlider.value);
-                const saturation = parseInt(saturationSlider.value);
-                const tintOpacity = parseInt(tintOpacitySlider.value) / 100; // Convert to 0-1 range
-                const tintColor = tintColorPicker.value;
-
-                // Apply Blur using StackBlur.js (modifies canvas directly)
-                if (blurRadius > 0) {
-                    StackBlur.canvasRGBA(mainCanvas, 0, 0, mainCanvas.width, mainCanvas.height, blurRadius);
-                }
-
-                // Apply Saturation using CSS filter
-                // We need to redraw the canvas content *after* setting the filter
-                // because filters apply to what's drawn *next*, not what's already there.
-                ctx.filter = `saturate(${saturation}%)`;
-                ctx.drawImage(mainCanvas, 0, 0, mainCanvas.width, mainCanvas.height);
-                ctx.filter = 'none'; // Reset filter immediately after applying to prevent affecting tint
-
-                // Apply Color Tint Overlay
-                if (tintOpacity > 0) {
-                    ctx.globalAlpha = tintOpacity; // Set the opacity for the tint layer
-                    ctx.globalCompositeOperation = 'color'; // Blending mode for tinting
-
-                    ctx.fillStyle = tintColor; // Set the tint color
-                    ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height); // Draw tint rectangle over entire canvas
-
-                    // IMPORTANT: Reset globalCompositeOperation and globalAlpha immediately!
-                    ctx.globalCompositeOperation = 'source-over'; // Reset to default
-                    ctx.globalAlpha = 1; // Reset to full opacity
-                }
-
-                // Update Download Link
-                downloadBtn.href = mainCanvas.toDataURL('image/png');
-                downloadBtn.download = 'atmosphere-image.png';
-
-                showLoadingSpinner(false);
-            }
-
-            // --- Event Listeners ---
-
-            // Image Upload Handler
-            imageUpload.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    showLoadingSpinner(true);
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            originalImage = img;
-                            applyAtmosphereEffect();
-                        };
-                        img.onerror = () => {
-                            alert('Could not load image. Please ensure it is a valid image file.');
-                            showLoadingSpinner(false);
-                        };
-                        img.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // Control Sliders and Color Picker
-            blurRadiusSlider.addEventListener('input', () => {
-                blurValueSpan.textContent = blurRadiusSlider.value;
-                applyAtmosphereEffect();
-            });
-
-            saturationSlider.addEventListener('input', () => {
-                saturationValueSpan.textContent = `${saturationSlider.value}%`;
-                applyAtmosphereEffect();
-            });
-
-            tintOpacitySlider.addEventListener('input', () => {
-                tintOpacityValueSpan.textContent = `${tintOpacitySlider.value}%`;
-                applyAtmosphereEffect();
-            });
-
-            tintColorPicker.addEventListener('input', () => {
-                applyAtmosphereEffect();
-            });
-
-            // --- Initial UI State ---
-            // Set initial display values for sliders
-            blurValueSpan.textContent = blurRadiusSlider.value;
-            saturationValueSpan.textContent = `${saturationSlider.value}%`;
-            tintOpacityValueSpan.textContent = `${tintOpacitySlider.value}%`;
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

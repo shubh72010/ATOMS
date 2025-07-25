@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const distortionFrequencySlider = document.getElementById('distortionFrequency');
     const distortionFrequencyValueSpan = document.getElementById('distortionFrequencyValue');
 
+    // New element reference for Preset Button
+    const loadPresetBtn = document.getElementById('loadPresetBtn');
+
 
     // --- Global Variables ---
     let originalImage = null;
@@ -218,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyAtmosphereEffect();
     });
 
-    // New event listeners for Noise and Distortion
+    // Event listeners for Noise and Distortion
     noiseIntensitySlider.addEventListener('input', () => {
         noiseValueSpan.textContent = noiseIntensitySlider.value;
         applyAtmosphereEffect();
@@ -231,6 +234,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     distortionFrequencySlider.addEventListener('input', () => {
         distortionFrequencyValueSpan.textContent = distortionFrequencySlider.value;
+        applyAtmosphereEffect();
+    });
+
+    // Event listener for Preset Button
+    loadPresetBtn.addEventListener('click', () => {
+        // Set slider values to the preset
+        blurRadiusSlider.value = 41;
+        saturationSlider.value = 1;
+        tintOpacitySlider.value = 0;
+        tintColorPicker.value = "#000000";
+        noiseIntensitySlider.value = 17;
+        distortionAmplitudeSlider.value = 30;
+        distortionFrequencySlider.value = 1;
+
+        // Update the displayed values
+        blurValueSpan.textContent = blurRadiusSlider.value;
+        saturationValueSpan.textContent = `${saturationSlider.value}%`;
+        tintOpacityValueSpan.textContent = `${tintOpacitySlider.value}%`;
+        noiseValueSpan.textContent = noiseIntensitySlider.value;
+        distortionAmplitudeValueSpan.textContent = distortionAmplitudeSlider.value;
+        distortionFrequencyValueSpan.textContent = distortionFrequencySlider.value;
+
+        // Apply the effects with the new preset values
         applyAtmosphereEffect();
     });
 

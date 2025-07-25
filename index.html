@@ -1,35 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Atmosphere Wallpaper Generator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATØMS Atmosphere Generator</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 1rem; }
-    canvas { max-width: 100%; height: auto; margin-top: 1rem; border: 1px solid #ccc; }
-    #controls { margin-top: 1rem; }
-    label { display: inline-block; margin: 0.5rem; }
-    button, input[type=file] { padding: 0.5rem 1rem; font-size: 1rem; }
-    a.button { 
-      display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; 
-      background: #007BFF; color: #fff; text-decoration: none; border-radius: 4px;
-    }
+    body { font-family: sans-serif; text-align: center; padding:1rem; background:#000; color:#fff; }
+    canvas { max-width:100%; border-radius:10px; margin-top:1rem; }
+    label, input, button { margin:0.5rem; }
+    button { padding:0.6rem 1.2rem; font-size:1rem; }
   </style>
 </head>
 <body>
-  <h1>Nothing OS Atmosphere Wallpaper</h1>
-  <p>Upload an image to apply a frosty Atmosphere blur effect. Then download the result for use as a mobile wallpaper.</p>
-
-  <div id="controls">
-    <input type="file" id="upload" accept="image/*"><br>
-    <label>
-      <input type="checkbox" id="centerFocus"> Center Focus Clarity
-    </label>
-  </div>
-
+  <h1>ATØMS – Atmosphere Generator</h1>
+  <input type="file" id="upload" accept="image/*" /><br>
+  <label><input type="checkbox" id="centerFocus" /> Show center clarity</label><br>
+  <button id="apply">Apply Atmosphere</button>
+  <br>
   <canvas id="canvas"></canvas><br>
-  <a id="downloadLink" class="button" style="display: none;">Download Wallpaper</a>
-
+  <a id="download" style="display:none;">Download Wallpaper</a>
   <script src="app.js"></script>
 </body>
 </html>

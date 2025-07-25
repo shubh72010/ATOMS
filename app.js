@@ -1,9 +1,11 @@
+const upload = document.getElementById("upload");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const downloadBtn = document.getElementById("download");
 
-const upload = document.getElementById("upload");
+upload.addEventListener("change", handleImage);
 
-upload.addEventListener("change", async (e) => {
+function handleImage(e) {
   const file = e.target.files[0];
   if (!file) return;
 
@@ -11,71 +13,77 @@ upload.addEventListener("change", async (e) => {
   img.onload = () => {
     canvas.width = img.width;
     canvas.height = img.height;
-
-    // Draw dark base
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Generate abstract blobs
-    for (let i = 0; i < 50; i++) {
-      drawBlobbyShape(img);
-    }
-
-    addNoise();
+    ctx.drawImage(img, 0, 0);
+    processImage(img);
   };
   img.src = URL.createObjectURL(file);
-});
+}
 
-function drawBlobbyShape(img) {
+function processImage(img) {
+  // Draw original
+  ctx.drawImage(img, 0, 0);
+
+  const shapeCount = 25;
+  for (let i = 0; i < shapeCount; i++) {
+    drawBlobEffect();
+  }
+
+  addGrain();
+}
+
+function drawBlobEffect() {
   const x = Math.random() * canvas.width;
   const y = Math.random() * canvas.height;
-  const w = 100 + Math.random() * 200;
-  const h = 100 + Math.random() * 200;
+  const radius = 100 + Math.random() * 150;
 
-  // Create blob path
-  ctx.beginPath();
-  const steps = 6 + Math.floor(Math.random() * 4);
-  for (let i = 0; i < steps; i++) {
-    const angle = (Math.PI * 2 * i) / steps;
-    const r = (w / 2) * (0.7 + Math.random() * 0.6);
-    const sx = x + r * Math.cos(angle);
-    const sy = y + r * Math.sin(angle);
-    if (i === 0) ctx.moveTo(sx, sy);
-    else ctx.quadraticCurveTo(x, y, sx, sy);
+  const path = new Path2D();
+  const points = 6 + Math.floor(Math.random() * 5);
+  for (let i = 0; i < points; i++) {
+    const angle = (i / points) * Math.PI * 2;
+    const r = radius * (0.8 + Math.random() * 0.4);
+    const px = x + Math.cos(angle) * r;
+    const py = y + Math.sin(angle) * r;
+    if (i === 0) path.moveTo(px, py);
+    else path.lineTo(px, py);
   }
-  ctx.closePath();
+  path.closePath();
 
-  // Get image section
-  const imgX = Math.max(0, x - w / 2);
-  const imgY = Math.max(0, y - h / 2);
-  const imgData = ctx.createImageData(w, h);
-  const tempCanvas = document.createElement("canvas");
-  const tempCtx = tempCanvas.getContext("2d");
-  tempCanvas.width = w;
-  tempCanvas.height = h;
-  tempCtx.drawImage(img, imgX, imgY, w, h, 0, 0, w, h);
+  // Sample color under center
+  const sample = ctx.getImageData(x, y, 1, 1).data;
+  const [r, g, b] = sample;
 
-  // Clip and draw
+  // Create a darkened fill
+  const fillStyle = `rgba(${r * 0.6}, ${g * 0.6}, ${b * 0.6}, 0.4)`;
+
   ctx.save();
-  ctx.clip();
-  ctx.drawImage(tempCanvas, x - w / 2, y - h / 2);
+  ctx.filter = "blur(12px)";
+  ctx.fillStyle = fillStyle;
+  ctx.fill(path);
   ctx.restore();
 }
 
-function addNoise() {
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  for (let i = 0; i < imageData.data.length; i += 4) {
-    const rand = (Math.random() - 0.5) * 20;
-    imageData.data[i] += rand;     // R
-    imageData.data[i + 1] += rand; // G
-    imageData.data[i + 2] += rand; // B
+function addGrain() {
+  const grainCanvas = document.createElement("canvas");
+  grainCanvas.width = canvas.width;
+  grainCanvas.height = canvas.height;
+  const grainCtx = grainCanvas.getContext("2d");
+
+  const grainData = grainCtx.createImageData(grainCanvas.width, grainCanvas.height);
+  for (let i = 0; i < grainData.data.length; i += 4) {
+    const val = Math.random() * 30;
+    grainData.data[i] = val;
+    grainData.data[i + 1] = val;
+    grainData.data[i + 2] = val;
+    grainData.data[i + 3] = 20;
   }
-  ctx.putImageData(imageData, 0, 0);
+
+  grainCtx.putImageData(grainData, 0, 0);
+  ctx.drawImage(grainCanvas, 0, 0);
 }
 
-function download() {
+downloadBtn.onclick = () => {
   const link = document.createElement("a");
-  link.download = "atøms_wallpaper.png";
+  link.download = "atØms-wallpaper.png";
   link.href = canvas.toDataURL();
   link.click();
-}
+};

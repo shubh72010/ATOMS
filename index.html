@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ATØMS Atmosphere Generator</title>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ATØMS Atmosphere</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding:1rem; background:#000; color:#fff; }
-    canvas { max-width:100%; border-radius:10px; margin-top:1rem; }
-    label, input, button { margin:0.5rem; }
-    button { padding:0.6rem 1.2rem; font-size:1rem; }
+    body{background:#000;color:#fff;font-family:sans-serif;text-align:center;padding:1rem;}
+    canvas{max-width:100%;margin-top:1rem;border-radius:10px;}
+    input, label, button{margin:0.5rem;padding:0.5rem 1rem;font-size:1rem;}
   </style>
 </head>
 <body>
-  <h1>ATØMS – Atmosphere Generator</h1>
-  <input type="file" id="upload" accept="image/*" /><br>
-  <label><input type="checkbox" id="centerFocus" /> Show center clarity</label><br>
-  <button id="apply">Apply Atmosphere</button>
-  <br>
+  <h1>ATØMS Atmosphere Generator</h1>
+  <input type="file" id="upload" accept="image/*"><br>
+  <label><input type="checkbox" id="centerFocus"> Center Clarity</label><br>
+  <button id="generate">Generate Atmosphere</button><br>
   <canvas id="canvas"></canvas><br>
   <a id="download" style="display:none;">Download Wallpaper</a>
   <script src="app.js"></script>

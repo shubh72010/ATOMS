@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mainCanvas.width = drawWidth;
         mainCanvas.height = drawHeight;
 
-        // --- Create a temporary canvas for distortion (and as source for other effects) ---
+        // --- Create a temporary canvas for distortion and noise ---
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
         tempCanvas.width = mainCanvas.width;
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const distortionFrequency = parseInt(distortionFrequencySlider.value);
 
 
-        // --- Apply Distortion (Wavy Effect) ---
+        // --- Apply Distortion (Wavy Effect) - Operates on tempCanvas ---
         if (distortionAmplitude > 0) {
             const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
             const data = imageData.data;
@@ -92,13 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             for (let y = 0; y < tempCanvas.height; y++) {
                 for (let x = 0; x < tempCanvas.width; x++) {
-                    // Calculate distorted source coordinates
-                    // Use Math.sin for a wavy effect. Adjust frequency based on slider.
-                    // Amplitude scales the wave intensity.
                     const sourceX = x + distortionAmplitude * Math.sin(y / distortionFrequency);
                     const sourceY = y + distortionAmplitude * Math.sin(x / distortionFrequency);
 
-                    // Helper to get pixel data safely (with clamping and rounding)
                     const getPixel = (imgData, sx, sy, width, height) => {
                         sx = Math.max(0, Math.min(width - 1, Math.round(sx)));
                         sy = Math.max(0, Math.min(height - 1, Math.round(sy)));
@@ -108,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     const [r, g, b, a] = getPixel(originalPixels, sourceX, sourceY, tempCanvas.width, tempCanvas.height);
 
-                    // Set the pixel on the current imageData (which will be put back on tempCtx)
                     const destIndex = (y * tempCanvas.width + x) * 4;
                     data[destIndex] = r;
                     data[destIndex + 1] = g;
@@ -116,59 +111,51 @@ document.addEventListener('DOMContentLoaded', () => {
                     data[destIndex + 3] = a;
                 }
             }
-            tempCtx.putImageData(imageData, 0, 0); // Put the distorted image data back onto the temporary canvas
+            tempCtx.putImageData(imageData, 0, 0);
         }
 
-        // --- Draw the content of the temporary canvas to the main canvas ---
-        // All subsequent effects (blur, saturation, tint, noise) will be applied to this distorted image.
+        // --- Apply Noise/Grain - Operates on tempCanvas (after distortion, before mainCanvas blur/saturation/tint) ---
+        if (noiseIntensity > 0) {
+            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                const offset = Math.random() * noiseIntensity * 2 - noiseIntensity;
+
+                data[i] = Math.max(0, Math.min(255, r + offset));
+                data[i + 1] = Math.max(0, Math.min(255, g + offset));
+                data[i + 2] = Math.max(0, Math.min(255, b + offset));
+            }
+            tempCtx.putImageData(imageData, 0, 0);
+        }
+
+        // --- Draw the content of the temporary canvas (now distorted and noisy) to the main canvas ---
         ctx.drawImage(tempCanvas, 0, 0);
 
 
-        // --- Apply Blur using StackBlur.js (modifies mainCanvas directly) ---
+        // --- Apply Blur using StackBlur.js (modifies mainCanvas directly, after distortion & noise) ---
         if (blurRadius > 0) {
             StackBlur.canvasRGBA(mainCanvas, 0, 0, mainCanvas.width, mainCanvas.height, blurRadius);
         }
 
         // --- Apply Saturation using CSS filter ---
-        // Redraw the main canvas content onto itself to apply the filter
         ctx.filter = `saturate(${saturation}%)`;
         ctx.drawImage(mainCanvas, 0, 0, mainCanvas.width, mainCanvas.height);
-        ctx.filter = 'none'; // Reset filter immediately after applying to prevent affecting tint/noise
+        ctx.filter = 'none';
 
         // --- Apply Color Tint Overlay ---
         if (tintOpacity > 0) {
-            ctx.globalAlpha = tintOpacity; // Set the opacity for the tint layer
-            ctx.globalCompositeOperation = 'color'; // Blending mode for tinting
-
-            ctx.fillStyle = tintColor; // Set the tint color
-            ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height); // Draw tint rectangle over entire canvas
-
-            // IMPORTANT: Reset globalCompositeOperation and globalAlpha immediately!
-            ctx.globalCompositeOperation = 'source-over'; // Reset to default
-            ctx.globalAlpha = 1; // Reset to full opacity
+            ctx.globalAlpha = tintOpacity;
+            ctx.globalCompositeOperation = 'color';
+            ctx.fillStyle = tintColor;
+            ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1;
         }
-
-        // --- Apply Noise/Grain ---
-        if (noiseIntensity > 0) {
-            const imageData = ctx.getImageData(0, 0, mainCanvas.width, mainCanvas.height);
-            const data = imageData.data; // This is a reference to the pixel data
-
-            for (let i = 0; i < data.length; i += 4) {
-                // Only modify RGB channels, not alpha
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-
-                // Generate random offset for each channel
-                const offset = Math.random() * noiseIntensity * 2 - noiseIntensity; // Random value between -intensity and +intensity
-
-                data[i] = Math.max(0, Math.min(255, r + offset));     // Red
-                data[i + 1] = Math.max(0, Math.min(255, g + offset)); // Green
-                data[i + 2] = Math.max(0, Math.min(255, b + offset)); // Blue
-            }
-            ctx.putImageData(imageData, 0, 0); // Put the modified pixel data back
-        }
-
 
         // --- Update Download Link ---
         downloadBtn.href = mainCanvas.toDataURL('image/png');
@@ -237,16 +224,17 @@ document.addEventListener('DOMContentLoaded', () => {
         applyAtmosphereEffect();
     });
 
-    // Event listener for Preset Button
+    // Event listener for Preset Button - Now reflecting your theory
     loadPresetBtn.addEventListener('click', () => {
-        // Set slider values to the REVISED preset
-        blurRadiusSlider.value = 45; // Increased blur for stronger haze
-        saturationSlider.value = 10; // More desaturated
-        tintOpacitySlider.value = 30; // Subtle dark tint
-        tintColorPicker.value = "#000000"; // Black tint color
-        noiseIntensitySlider.value = 20; // Slightly more noise
-        distortionAmplitudeSlider.value = 25; // Slightly less wavy
-        distortionFrequencySlider.value = 5; // Fewer, broader waves
+        // Preset values adjusted to emphasize stronger initial distortion and noise
+        // before blur, based on your theory.
+        blurRadiusSlider.value = 35; // Still strong blur, but perhaps slightly less if initial distortion/noise handles some "haze"
+        saturationSlider.value = 5; // Very desaturated
+        tintOpacitySlider.value = 40; // More noticeable tint
+        tintColorPicker.value = "#222222"; // A very dark gray/near black tint for depth
+        noiseIntensitySlider.value = 30; // Stronger noise for a more pronounced grain
+        distortionAmplitudeSlider.value = 45; // Significantly more distortion ("very much")
+        distortionFrequencySlider.value = 2; // Fewer, larger, more apparent waves
 
         // Update the displayed values
         blurValueSpan.textContent = blurRadiusSlider.value;

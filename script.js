@@ -124,15 +124,74 @@ if (plusFabButton) {
 }
 
 
-// --- Search Bar Functionality ---
+// --- Search Bar and Autofill Functionality ---
 const searchInput = document.querySelector('.main-search-bar input');
 const searchIcon = document.querySelector('.main-search-bar .material-icons:first-child'); // Assuming first icon is search
+const searchSuggestionsContainer = document.querySelector('.search-suggestions'); // New element for suggestions
 
-// Initialize Nominatim geocoder separately for direct search
+// Initialize Nominatim geocoder separately for direct search and autofill
 const geocoder = L.Control.Geocoder.nominatim();
 
+// Debounce function to limit API calls during typing
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+
+// Function to clear suggestions
+function clearSuggestions() {
+    searchSuggestionsContainer.innerHTML = '';
+    searchSuggestionsContainer.style.display = 'none'; // Hide the container
+}
+
+// Function to handle input for autofill
+const handleSearchInput = debounce((e) => {
+    const query = e.target.value.trim();
+
+    if (query.length < 3) { // Only search if query is at least 3 characters
+        clearSuggestions();
+        return;
+    }
+
+    geocoder.geocode(query, function(results) {
+        clearSuggestions(); // Clear previous suggestions
+        if (results && results.length > 0) {
+            searchSuggestionsContainer.style.display = 'block'; // Show the container
+            results.forEach(result => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.classList.add('suggestion-item');
+                suggestionItem.textContent = result.name;
+                // Store data for later use when clicked
+                suggestionItem.dataset.lat = result.center.lat;
+                suggestionItem.dataset.lng = result.center.lng;
+                suggestionItem.dataset.name = result.name;
+
+                suggestionItem.addEventListener('click', () => {
+                    searchInput.value = suggestionItem.dataset.name; // Populate search bar
+                    clearSuggestions(); // Clear suggestions
+                    performSearch(); // Perform the full search for the selected item
+                });
+                searchSuggestionsContainer.appendChild(suggestionItem);
+            });
+        }
+    });
+}, 300); // Debounce delay of 300ms
+
+// Add event listener for input (typing)
+searchInput.addEventListener('input', handleSearchInput);
+
+// Hide suggestions when search input loses focus (with a slight delay to allow click)
+searchInput.addEventListener('blur', () => {
+    setTimeout(clearSuggestions, 200);
+});
+
+// Original performSearch function (now also called by autofill click)
 function performSearch() {
-    const query = searchInput.value;
+    const query = searchInput.value; // Get value directly from input (might be autofilled)
     if (query.trim() === '') {
         alert('Please enter a place to search.');
         return;
@@ -207,8 +266,8 @@ function performSearch() {
                 }
             });
 
-            // Clear the search input
-            searchInput.value = '';
+            // No longer clear searchInput here, as autofill might have populated it
+            // searchInput.value = '';
 
         } else {
             alert('Place not found. Please try a different search term.');
@@ -216,16 +275,16 @@ function performSearch() {
     });
 }
 
-// Add event listeners for search
+// Add event listeners for search icon click and Enter key
 searchIcon.addEventListener('click', performSearch);
 searchInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         performSearch();
+        clearSuggestions(); // Also hide suggestions on Enter
     }
 });
 
 // --- Bottom Navigation Bar placeholder (no functionality in script.js for now) ---
-// You can add specific JavaScript functionality for each nav-item here later if needed.
 const navItems = document.querySelectorAll('.nav-item');
 navItems.forEach(item => {
     item.addEventListener('click', () => {

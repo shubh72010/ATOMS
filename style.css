@@ -5,24 +5,35 @@
 
 body {
     margin: 0;
-    padding: 0;
+    /* Use safe-area-inset-bottom for padding so content doesn't get hidden */
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
     overflow: hidden; /* Prevent scrollbars */
     font-family: 'Roboto', Arial, sans-serif; /* A clean font, or whatever you prefer */
 }
 
 #map {
-    width: 100vw; /* 100% of viewport width */
-    height: 100vh; /* 100% of viewport height */
+    /* Map still covers full viewport, but other elements respect safe areas */
+    width: 100vw;
+    height: 100vh;
+    /* Add padding to the map itself to prevent internal map controls from being covered */
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
 }
 
 /* --- Frosted UI Elements --- */
 
 /* Main Search Bar (Frosted and Centered) */
 .main-search-bar {
-    position: absolute; /* Absolute position relative to the body */
-    top: 50%;           /* Move top edge to 50% down */
-    left: 50%;          /* Move left edge to 50% across */
-    transform: translate(-50%, -50%); /* Adjust to truly center the element */
+    position: fixed; /* Use fixed for elements that stay on screen relative to viewport */
+    left: 50%;          /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for horizontal centering */
+    
+    /* Dynamic vertical positioning */
+    /* Center it between the top of the safe area and the bottom of the safe area */
+    top: calc(50% + (env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0)) / 2);
+
     width: 90%;         /* Occupy most of the width */
     max-width: 500px;   /* Limit maximum width for larger screens */
     height: 60px;       /* Fixed height */
@@ -38,7 +49,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     color: #fff;
-    z-index: 1000; /* Ensure it's above the map */
+    z-index: 1000;
 }
 
 .main-search-bar .material-icons {
@@ -54,13 +65,13 @@ body {
 }
 
 .main-search-bar input {
-    flex-grow: 1; /* Takes up available space */
+    flex-grow: 1;
     border: none;
     background: transparent;
     color: #fff;
     padding: 0 10px;
     font-size: 1.1em;
-    outline: none; /* Remove blue outline on focus */
+    outline: none;
 }
 
 .main-search-bar input::placeholder {
@@ -71,12 +82,13 @@ body {
 /* Floating Action Button (FAB) Styling */
 .fab {
     position: fixed;
-    bottom: 20px; /* Position at the bottom right, independent of search bar */
-    right: 20px;
+    /* Adjust bottom to clear browser UI */
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px)); /* Also adjust for right inset if any */
     width: 56px;
     height: 56px;
-    border-radius: 50%; /* Circular shape */
-    background-color: #1976D2; /* A Google Maps-like blue */
+    border-radius: 50%;
+    background-color: #1976D2;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -84,11 +96,11 @@ body {
     font-size: 32px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    z-index: 1001; /* Higher than other UI elements */
+    z-index: 1001;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .fab:hover {
     background-color: #1565C0;
-    transform: translateY(-2px); /* Slight lift effect */
+    transform: translateY(-2px);
 }

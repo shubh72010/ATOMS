@@ -92,7 +92,7 @@ if (locationFabButton) {
 // Store a reference to the routing control instance
 let routingControl = L.Routing.control({
     waypoints: [
-        L.latLng(28.6139, 77.2090), // Default start (will be replaced by user location if found)
+        L.latLng(28.6139, 77.2090), // Default start
         L.latLng(28.7041, 77.1025)  // Example destination
     ],
     routeWhileDragging: true,
@@ -104,22 +104,21 @@ let routingControl = L.Routing.control({
 // Hide the routing control initially
 routingControl.hide();
 
-
-// --- Plus Button (+) (FAB) Functionality ---
-const plusFabButton = document.querySelector('.fab:not(#location-fab)'); // Selects the FAB that is not the location FAB
-let routeMarker = null; // To keep track of the temporary search result marker
+// --- Plus Button (+) (FAB) Functionality (for new route) ---
+const plusFabButton = document.querySelector('.fab.main-fab'); // Selects the FAB with class 'main-fab'
+let searchResultMarker = null; // To keep track of the temporary search result marker
 
 if (plusFabButton) {
     plusFabButton.addEventListener('click', () => {
         // Clear existing waypoints to start a new route
         routingControl.setWaypoints([]);
         routingControl.show(); // Show the routing control panel
-        alert('Ready for a new route! Enter start and end points in the top-left panel.');
+        alert('Ready for a new route! Click on the map for start/end points, or use the panel.');
 
         // Optionally, remove the temporary search marker if it exists
-        if (routeMarker) {
-            map.removeLayer(routeMarker);
-            routeMarker = null;
+        if (searchResultMarker) {
+            map.removeLayer(searchResultMarker);
+            searchResultMarker = null;
         }
     });
 }
@@ -145,19 +144,56 @@ function performSearch() {
             map.setView(firstResult.center, 15); // Center map on result
 
             // Clear previous search marker if any
-            if (routeMarker) {
-                map.removeLayer(routeMarker);
+            if (searchResultMarker) {
+                map.removeLayer(searchResultMarker);
             }
+
+            // Create HTML content for the popup including the "Set as Destination" button
+            const popupContent = `
+                <b>${firstResult.name}</b><br>
+                ${firstResult.html}<br><br>
+                <button class="set-destination-btn"
+                        data-lat="${firstResult.center.lat}"
+                        data-lng="${firstResult.center.lng}">Set as Destination</button>
+            `;
+
             // Add a new marker for the search result
-            routeMarker = L.marker(firstResult.center).addTo(map)
-                .bindPopup(`<b>${firstResult.name}</b><br>${firstResult.html}`).openPopup(); // Show more info in popup
+            searchResultMarker = L.marker(firstResult.center).addTo(map)
+                .bindPopup(popupContent);
+            
+            // Open the popup immediately
+            searchResultMarker.openPopup();
+
+            // Add event listener to the button once the popup is open
+            searchResultMarker.on('popupopen', function() {
+                const setDestinationBtn = document.querySelector('.set-destination-btn');
+                if (setDestinationBtn) {
+                    setDestinationBtn.addEventListener('click', function() {
+                        const lat = parseFloat(this.dataset.lat);
+                        const lng = parseFloat(this.dataset.lng);
+                        const destinationLatLng = L.latLng(lat, lng);
+
+                        // Determine start point: user's location if known, else map center
+                        const startPoint = lastKnownUserLocation || map.getCenter();
+
+                        // Set waypoints for routing
+                        routingControl.setWaypoints([
+                            startPoint,
+                            destinationLatLng
+                        ]);
+                        routingControl.show(); // Show the routing panel
+                        map.closePopup(); // Close the search result popup
+                        // Optionally, remove the temporary search marker
+                        if (searchResultMarker) {
+                            map.removeLayer(searchResultMarker);
+                            searchResultMarker = null;
+                        }
+                    });
+                }
+            });
 
             // Clear the search input
             searchInput.value = '';
-
-            // Optionally: If you want to use this search result as a waypoint for routing:
-            // routingControl.setWaypoints([lastKnownUserLocation || map.getCenter(), firstResult.center]);
-            // routingControl.show();
 
         } else {
             alert('Place not found. Please try a different search term.');
@@ -171,4 +207,14 @@ searchInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         performSearch();
     }
+});
+
+// --- Bottom Navigation Bar placeholder (no functionality in script.js for now) ---
+// You can add specific JavaScript functionality for each nav-item here later if needed.
+const navItems = document.querySelectorAll('.nav-item');
+navItems.forEach(item => {
+    item.addEventListener('click', () => {
+        // Example: alert(item.querySelector('span:last-child').textContent + ' clicked!');
+        // Add specific logic for Explore, Saved, You, Contribute here.
+    });
 });

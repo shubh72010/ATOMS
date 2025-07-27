@@ -10,7 +10,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 // --- User Location Logic ---
 let userMarker; // To store the user's location marker
-let accuracyCircle; // To store the accuracy circle
+let accuracyCircle; // To store the the accuracy circle
 
 function onLocationFound(e) {
     // If a previous marker/circle exists, remove them
@@ -41,7 +41,9 @@ function onLocationFound(e) {
 
 function onLocationError(e) {
     console.error(e.message);
-    document.getElementById('coordinates').textContent = 'Location unavailable or denied.';
+    // You might want to display a message on the UI directly, e.g., in the bottom search bar placeholder
+    // For now, we'll just log and fall back to a default view
+    console.log('Location unavailable or denied. Falling back to Delhi.');
     // Fallback to Delhi if location is not found
     map.setView([28.6139, 77.2090], 13);
     L.marker([28.6139, 77.2090]).addTo(map)
@@ -52,15 +54,14 @@ function onLocationError(e) {
 // Request user's location
 if (!navigator.geolocation) {
     console.error('Geolocation is not supported by your browser');
-    document.getElementById('coordinates').textContent = 'Geolocation not supported.';
+    console.log('Geolocation not supported. Falling back to Delhi.');
     // Fallback if geolocation is not supported
     map.setView([28.6139, 77.2090], 13);
     L.marker([28.6139, 77.2090]).addTo(map)
         .bindPopup('<b>Hello world!</b><br />Geolocation not supported. Displaying Delhi.')
         .openPopup();
 } else {
-    // Show a temporary message while trying to get location
-    document.getElementById('coordinates').textContent = 'Getting your location...';
+    // No longer updating info-box span directly. Just try to get location.
     map.locate({setView: false, maxZoom: 16, watch: true, enableHighAccuracy: true}); // watch: true to continuously update
 }
 
@@ -81,18 +82,5 @@ L.Routing.control({
     showAlternatives: true,
 }).addTo(map);
 
-// --- Optional: Update coordinates in the info box when the map moves (if not showing user location) ---
-// This will now primarily update when the map is manually moved, or if geolocation fails.
-const coordinatesSpan = document.getElementById('coordinates');
-map.on('moveend', function() {
-    // Only update if we are not actively tracking user's precise location (or if location failed)
-    // The onLocationFound function will handle setting text if location is found
-    if (!userMarker) { // If userMarker doesn't exist, means geolocation didn't succeed or hasn't yet.
-        const center = map.getCenter();
-        coordinatesSpan.textContent = `${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`;
-    }
-});
-
-// Initial update for the info box, reflects the initial map view
-const initialCenter = map.getCenter();
-coordinatesSpan.textContent = `${initialCenter.lat.toFixed(4)}, ${initialCenter.lng.toFixed(4)}`;
+// Removed all previous 'coordinatesSpan' and 'map.on('moveend')' logic
+// as the info box is removed.

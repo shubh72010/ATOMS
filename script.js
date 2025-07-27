@@ -8,31 +8,24 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19
 }).addTo(map);
 
-// Add a marker (optional, but good for demonstrating functionality)
+// Add a marker (optional)
 L.marker([28.6139, 77.2090]).addTo(map)
     .bindPopup('<b>Hello world!</b><br />This is Delhi, India.')
     .openPopup();
 
 // Initialize the routing control
-// This will add input fields for origin and destination, and display the route.
+// It will appear in the top-left by default.
 L.Routing.control({
     waypoints: [
         L.latLng(28.6139, 77.2090), // Example starting point (Delhi)
-        L.latLng(28.7041, 77.1025)  // Example destination (another point in Delhi, e.g., Connaught Place area)
+        L.latLng(28.7041, 77.1025)  // Example destination (another point in Delhi)
     ],
-    routeWhileDragging: true, // Recalculate route while dragging waypoints
-    geocoder: L.Control.Geocoder.nominatim(), // Use Nominatim for address search (optional, but useful)
-    // You can customize the routing service if needed, for example:
-    // router: L.Routing.osrmv1({
-    //     serviceUrl: 'http://router.project-osrm.org/route/v1' // Public OSRM demo server
-    // }),
-    showAlternatives: true, // Show alternative routes
-    // For the frosted UI, we might want to style the routing control.
-    // However, direct styling of the control's internal elements can be complex.
-    // The control itself will float on top of the map.
+    routeWhileDragging: true,
+    geocoder: L.Control.Geocoder.nominatim(),
+    showAlternatives: true,
 }).addTo(map);
 
-// Optional: Update coordinates in the info box when the map moves
+// Update coordinates in the info box when the map moves
 const coordinatesSpan = document.getElementById('coordinates');
 map.on('moveend', function() {
     const center = map.getCenter();

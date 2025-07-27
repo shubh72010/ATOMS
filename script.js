@@ -151,10 +151,20 @@ function performSearch() {
             // Create HTML content for the popup including the "Set as Destination" button
             const popupContent = `
                 <b>${firstResult.name}</b><br>
-                ${firstResult.html}<br><br>
+                ${firstResult.html || ''}<br><br>
                 <button class="set-destination-btn"
                         data-lat="${firstResult.center.lat}"
-                        data-lng="${firstResult.center.lng}">Set as Destination</button>
+                        data-lng="${firstResult.center.lng}"
+                        style="
+                            background-color: #1976D2;
+                            color: white;
+                            border: none;
+                            padding: 8px 12px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 0.9em;
+                            margin-top: 10px;
+                        ">Set as Destination</button>
             `;
 
             // Add a new marker for the search result
@@ -164,9 +174,12 @@ function performSearch() {
             // Open the popup immediately
             searchResultMarker.openPopup();
 
-            // Add event listener to the button once the popup is open
+            // IMPORTANT: Add event listener to the button once the popup is open
             searchResultMarker.on('popupopen', function() {
-                const setDestinationBtn = document.querySelector('.set-destination-btn');
+                // Select the button *within* the popup's actual DOM element
+                const popupDomElement = searchResultMarker.getPopup().getElement();
+                const setDestinationBtn = popupDomElement ? popupDomElement.querySelector('.set-destination-btn') : null;
+
                 if (setDestinationBtn) {
                     setDestinationBtn.addEventListener('click', function() {
                         const lat = parseFloat(this.dataset.lat);
@@ -189,6 +202,8 @@ function performSearch() {
                             searchResultMarker = null;
                         }
                     });
+                } else {
+                    console.error("Set Destination button not found in popup DOM element.");
                 }
             });
 

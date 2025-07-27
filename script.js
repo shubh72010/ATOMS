@@ -1,4 +1,4 @@
-// Initialize the map (initially centered on a  default location, will be updated by geolocation)
+// Initialize the map (initially centered on a default location, will be updated by geolocation)
 const map = L.map('map').setView([20.5937, 78.9629], 5); // Default: Center of India, broader zoom
 
 // Add CartoDB Dark Matter tile layer for a dark theme
@@ -88,9 +88,9 @@ if (locationFabButton) {
     });
 }
 
-
-// --- Routing Control (from previous step) ---
-L.Routing.control({
+// --- Routing Control ---
+// Store a reference to the routing control instance
+let routingControl = L.Routing.control({
     waypoints: [
         L.latLng(28.6139, 77.2090), // Default start (will be replaced by user location if found)
         L.latLng(28.7041, 77.1025)  // Example destination
@@ -98,4 +98,77 @@ L.Routing.control({
     routeWhileDragging: true,
     geocoder: L.Control.Geocoder.nominatim(),
     showAlternatives: true,
+    collapsible: true // Make the routing control collapsible
 }).addTo(map);
+
+// Hide the routing control initially
+routingControl.hide();
+
+
+// --- Plus Button (+) (FAB) Functionality ---
+const plusFabButton = document.querySelector('.fab:not(#location-fab)'); // Selects the FAB that is not the location FAB
+let routeMarker = null; // To keep track of the temporary search result marker
+
+if (plusFabButton) {
+    plusFabButton.addEventListener('click', () => {
+        // Clear existing waypoints to start a new route
+        routingControl.setWaypoints([]);
+        routingControl.show(); // Show the routing control panel
+        alert('Ready for a new route! Enter start and end points in the top-left panel.');
+
+        // Optionally, remove the temporary search marker if it exists
+        if (routeMarker) {
+            map.removeLayer(routeMarker);
+            routeMarker = null;
+        }
+    });
+}
+
+
+// --- Search Bar Functionality ---
+const searchInput = document.querySelector('.main-search-bar input');
+const searchIcon = document.querySelector('.main-search-bar .material-icons:first-child'); // Assuming first icon is search
+
+// Initialize Nominatim geocoder separately for direct search
+const geocoder = L.Control.Geocoder.nominatim();
+
+function performSearch() {
+    const query = searchInput.value;
+    if (query.trim() === '') {
+        alert('Please enter a place to search.');
+        return;
+    }
+
+    geocoder.geocode(query, function(results) {
+        if (results && results.length > 0) {
+            const firstResult = results[0];
+            map.setView(firstResult.center, 15); // Center map on result
+
+            // Clear previous search marker if any
+            if (routeMarker) {
+                map.removeLayer(routeMarker);
+            }
+            // Add a new marker for the search result
+            routeMarker = L.marker(firstResult.center).addTo(map)
+                .bindPopup(`<b>${firstResult.name}</b><br>${firstResult.html}`).openPopup(); // Show more info in popup
+
+            // Clear the search input
+            searchInput.value = '';
+
+            // Optionally: If you want to use this search result as a waypoint for routing:
+            // routingControl.setWaypoints([lastKnownUserLocation || map.getCenter(), firstResult.center]);
+            // routingControl.show();
+
+        } else {
+            alert('Place not found. Please try a different search term.');
+        }
+    });
+}
+
+// Add event listeners for search
+searchIcon.addEventListener('click', performSearch);
+searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});

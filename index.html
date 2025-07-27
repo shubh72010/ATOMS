@@ -9,10 +9,26 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="map"></div>
+
+    <div class="header-container">
+        <div class="search-bar">
+            <span class="material-icons">menu</span> <input type="text" placeholder="Search here">
+            <span class="material-icons">mic</span> <span class="material-icons profile-icon">account_circle</span> </div>
+        <div class="category-pills">
+            <div class="pill active"><span class="material-icons">restaurant</span> Restaurants</div>
+            <div class="pill"><span class="material-icons">local_gas_station</span> Petrol</div>
+            <div class="pill"><span class="material-icons">hotel</span> Hotels</div>
+            <div class="pill"><span class="material-icons">shopping_bag</span> Shopping</div>
+            <div class="pill"><span class="material-icons">local_cafe</span> Cafes</div>
+            <div class="pill"><span class="material-icons">park</span> Parks</div>
+        </div>
+    </div>
 
     <div id="info-box">
         <h3>Map Info</h3>
@@ -20,9 +36,27 @@
         <p>Current coordinates: <span id="coordinates">N/A</span></p>
     </div>
 
-    <div id="bottom-bar">
-        <span>© 2025 My Map App</span>
-        <button id="toggleRouteBtn">Show/Hide Route Panel</button>
+    <div class="bottom-nav-bar">
+        <div class="nav-item active">
+            <span class="material-icons">explore</span>
+            <span>Explore</span>
+        </div>
+        <div class="nav-item">
+            <span class="material-icons">bookmark</span>
+            <span>Saved</span>
+        </div>
+        <div class="nav-item">
+            <span class="material-icons">person</span>
+            <span>You</span>
+        </div>
+        <div class="nav-item">
+            <span class="material-icons">add_box</span>
+            <span>Contribute</span>
+        </div>
+    </div>
+
+    <div class="fab">
+        <span class="material-icons">add</span>
     </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

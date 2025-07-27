@@ -93,7 +93,7 @@ if (locationFabButton) {
 let routingControl = L.Routing.control({
     // Use OpenRouteService for routing calculations
     // !!! IMPORTANT: Replace 'YOUR_OPENROUTESERVICE_API_KEY' with your actual key !!!
-    router: L.Routing.openrouteservice('YOUR_OPENROUTESERVICE_API_KEY', {
+    router: L.Routing.openrouteservice('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjQzOTM3ZTJlMzA3NjRiODlhOGQ5MjgyNjlmNzA1Y2EzIiwiaCI6Im11cm11cjY0In0=', {
         serviceUrl: 'https://api.openrouteservice.org/v2/directions/',
         profile: 'driving-car' // or 'cycling', 'walking', 'driving-hgv', 'driving-motorcycle'
     }),

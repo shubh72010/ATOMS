@@ -1,41 +1,42 @@
-/* Existing CSS for body and map */
-body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
+/* Existing CSS for body, map, and info-box */
 
-#map {
-    width: 100vw;
-    height: 100vh;
-}
-
-/* Frosted UI Look for Info Box */
-#info-box {
-    position: absolute; /* Position it relative to the viewport */
-    top: 20px;          /* 20px from the top */
-    right: 20px;        /* 20px from the right */
+/* Frosted UI Look for Bottom Bar */
+#bottom-bar {
+    position: fixed; /* Fixes it to the viewport */
+    bottom: 0;       /* Aligns to the bottom */
+    left: 0;         /* Aligns to the left */
+    width: 100%;     /* Spans full width */
+    height: 60px;    /* Fixed height for the bar */
     background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
-    backdrop-filter: blur(8px); /* The magic! Adjust blur value as desired */
+    backdrop-filter: blur(8px); /* Frosted effect */
     -webkit-backdrop-filter: blur(8px); /* For Safari compatibility */
-    color: #fff;       /* White text color for contrast */
-    padding: 15px 20px; /* Padding inside the box */
-    border-radius: 10px; /* Slightly rounded corners */
-    z-index: 1000;      /* Ensure it's above the map */
+    color: #fff;       /* White text color */
+    display: flex;     /* Use flexbox for content alignment */
+    justify-content: space-between; /* Space out content */
+    align-items: center; /* Vertically center content */
+    padding: 0 20px;   /* Horizontal padding */
+    z-index: 1000;     /* Ensure it's above the map and other elements */
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow on top edge */
     font-family: Arial, sans-serif; /* Basic font styling */
-    max-width: 250px;   /* Limit width so it doesn't cover too much map */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
 }
 
-#info-box h3 {
-    margin-top: 0;
-    font-size: 1.2em;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Subtle separator */
-    padding-bottom: 5px;
-    margin-bottom: 10px;
-}
-
-#info-box p {
-    margin-bottom: 5px;
+#bottom-bar span {
     font-size: 0.9em;
+    opacity: 0.8;
+}
+
+#bottom-bar button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#bottom-bar button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
 }

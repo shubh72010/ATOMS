@@ -1,42 +1,227 @@
-/* Existing CSS for body, map, and info-box */
+/* Universal box-sizing for easier layout */
+* {
+    box-sizing: border-box;
+}
 
-/* Frosted UI Look for Bottom Bar */
-#bottom-bar {
-    position: fixed; /* Fixes it to the viewport */
-    bottom: 0;       /* Aligns to the bottom */
-    left: 0;         /* Aligns to the left */
-    width: 100%;     /* Spans full width */
-    height: 60px;    /* Fixed height for the bar */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
+    font-family: 'Roboto', Arial, sans-serif; /* A clean font, or whatever you prefer */
+}
+
+#map {
+    width: 100vw; /* 100% of viewport width */
+    height: 100vh; /* 100% of viewport height */
+}
+
+/* --- Frosted UI Elements --- */
+
+/* Header Container (Top Bar & Categories) */
+.header-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure it's above the map and other elements */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.search-bar,
+.category-pills,
+.bottom-nav-bar,
+.fab {
+    /* Base frosted styles */
     background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
-    backdrop-filter: blur(8px); /* Frosted effect */
-    -webkit-backdrop-filter: blur(8px); /* For Safari compatibility */
-    color: #fff;       /* White text color */
-    display: flex;     /* Use flexbox for content alignment */
-    justify-content: space-between; /* Space out content */
-    align-items: center; /* Vertically center content */
-    padding: 0 20px;   /* Horizontal padding */
-    z-index: 1000;     /* Ensure it's above the map and other elements */
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow on top edge */
-    font-family: Arial, sans-serif; /* Basic font styling */
+    backdrop-filter: blur(8px);           /* The frosted effect */
+    -webkit-backdrop-filter: blur(8px);   /* Safari compatibility */
+    border-radius: 12px;                  /* Rounded corners for the frosted elements */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    color: #fff;                          /* White text */
 }
 
-#bottom-bar span {
-    font-size: 0.9em;
-    opacity: 0.8;
-}
-
-#bottom-bar button {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+/* Search Bar Styling */
+.search-bar {
+    display: flex;
+    align-items: center;
     padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    height: 50px; /* Fixed height for consistency */
 }
 
-#bottom-bar button:hover {
+.search-bar input {
+    flex-grow: 1; /* Takes up available space */
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 0 10px;
+    font-size: 1.1em;
+    outline: none; /* Remove blue outline on focus */
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-bar .material-icons {
+    font-size: 24px;
+    cursor: pointer;
+    margin: 0 5px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.search-bar .material-icons:hover {
+    opacity: 1;
+}
+
+.search-bar .profile-icon {
+    font-size: 30px; /* Slightly larger for profile */
+    border-radius: 50%; /* Make it circular */
+    margin-left: 10px;
+}
+
+/* Category Pills Styling */
+.category-pills {
+    display: flex;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent pills from wrapping */
+    padding: 8px 10px;
+    gap: 10px; /* Space between pills */
+    /* Remove shadow from header container to put it on individual pills if desired */
+    box-shadow: none; /* Removed for now, can be re-added if desired */
+    /* Set background and blur for header-container if you want pills to be separate frosted items */
+}
+
+.category-pills::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for a cleaner look */
+}
+.category-pills {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px; /* Pill shape */
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly lighter background for pills */
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0; /* Prevent pills from shrinking */
+}
+
+.pill:hover {
     background-color: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.pill.active {
+    background-color: rgba(25, 118, 210, 0.6); /* Example active color (blue) */
+    font-weight: bold;
+}
+
+.pill .material-icons {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+
+/* Info Box Styling (Adjusted Position) */
+#info-box {
+    position: absolute;
+    top: 150px; /* Below the header-container */
+    left: 20px; /* On the left side */
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    z-index: 999; /* Slightly lower than header but still above map */
+    font-family: Arial, sans-serif;
+    max-width: 250px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#info-box h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+#info-box p {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+
+/* Bottom Navigation Bar Styling */
+.bottom-nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px; /* Height for the bottom bar */
+    display: flex;
+    justify-content: space-around; /* Distribute items evenly */
+    align-items: center;
+    padding: 5px 0;
+    z-index: 1000;
+}
+
+.bottom-nav-bar .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.7em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    flex: 1; /* Each item takes equal width */
+}
+
+.bottom-nav-bar .nav-item:hover {
+    color: #fff;
+}
+
+.bottom-nav-bar .nav-item.active {
+    color: #fff;
+    font-weight: bold;
+}
+
+.bottom-nav-bar .nav-item .material-icons {
+    font-size: 24px;
+    margin-bottom: 2px;
+}
+
+/* Floating Action Button (FAB) Styling */
+.fab {
+    position: fixed;
+    bottom: 90px; /* Position above the bottom nav bar */
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%; /* Circular shape */
+    background-color: #1976D2; /* A Google Maps-like blue */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 32px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    z-index: 1001; /* Higher than other UI elements */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.fab:hover {
+    background-color: #1565C0;
+    transform: translateY(-2px); /* Slight lift effect */
 }

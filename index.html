@@ -2,60 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>My Free Map App</title>
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nothing Maps</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzxHjGBLSdfgfZDPzDnrD50IDU=" crossorigin=""/>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="map"></div>
 
-    <div class="search-container">
-        <div class="main-search-bar">
-            <span class="material-icons">search</span> <input type="text" placeholder="Search here...">
-            <span class="material-icons">mic</span> </div>
-        <div class="search-suggestions">
-            </div>
-    </div>
-
-    <div class="fab main-fab">
-        <span class="material-icons">add</span>
-    </div>
-
-    <div id="location-fab" class="fab">
-        <span class="material-icons">my_location</span>
-    </div>
-
-    <div class="bottom-nav-bar">
-        <div class="nav-item">
-            <span class="material-icons">explore</span>
-            <span>Explore</span>
+    <div class="controls-container">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search location...">
+            <button id="searchButton">Search</button>
         </div>
-        <div class="nav-item">
-            <span class="material-icons">bookmark</span>
-            <span>Saved</span>
-        </div>
-        <div class="nav-item">
-            <span class="material-icons">person</span>
-            <span>You</span>
-        </div>
-        <div class="nav-item">
-            <span class="material-icons">add_location</span>
-            <span>Contribute</span>
+
+        <div class="routing-container">
+            <input type="text" id="startInput" placeholder="Start location...">
+            <input type="text" id="endInput" placeholder="End location...">
+            <button id="routeButton">Get Directions</button>
         </div>
     </div>
 
+    <div class="attribution-container">
+        Map data: <a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>. Geocoding: <a href="https://nominatim.org/" target="_blank">Nominatim</a>. Routing: <a href="https://openrouteservice.org/" target="_blank">Openrouteservice</a>.
+    </div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/4K9+fdNrwpFBTgBKhbCg=" crossorigin=""></script>
     <script src="script.js"></script>
 </body>
 </html>

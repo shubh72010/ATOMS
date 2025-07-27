@@ -5,7 +5,7 @@
 
 body {
     margin: 0;
-    padding: 0; /* Map will cover full viewport, UI elements float on top */
+    padding: 0;
     overflow: hidden; /* Prevent scrollbars */
     font-family: 'Roboto', Arial, sans-serif; /* A clean font, or whatever you prefer */
 }
@@ -20,32 +20,36 @@ body {
 
 /* Base styles for frosted elements */
 .main-search-bar,
-.bottom-nav-bar, /* New: bottom nav bar gets frosted style */
-.fab {
-    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
-    backdrop-filter: blur(8px);           /* The frosted effect */
-    -webkit-backdrop-filter: blur(8px);   /* Safari compatibility */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
-    color: #fff;                          /* White text */
+.bottom-nav-bar,
+.fab,
+.search-suggestions { /* New: search suggestions also get frosted style */
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    color: #fff;
 }
 
-/* Main Search Bar (Frosted and Top-positioned) */
-.main-search-bar {
+/* Search Container: Positions the entire search component (bar + suggestions) */
+.search-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    
-    padding: calc(10px + env(safe-area-inset-top, 0px)) 15px 10px;
-    
-    height: auto;
+    z-index: 1000; /* Ensure it's above the map and other non-fab UI */
+    /* No border-radius here, as the search bar itself has it */
+}
+
+/* Main Search Bar (Frosted and Top-positioned) */
+.main-search-bar {
+    /* Removed position:fixed, top, left, width as it's now handled by .search-container */
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 15px 10px; /* Still uses safe area for content */
     min-height: calc(60px + env(safe-area-inset-top, 0px));
     
     display: flex;
     align-items: center;
 
-    border-radius: 0 0 12px 12px;
-    z-index: 1000;
+    border-radius: 0 0 12px 12px; /* Rounded corners only at the bottom */
 }
 
 .main-search-bar .material-icons {
@@ -74,33 +78,64 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* Autofill Suggestions List Styling */
+.search-suggestions {
+    position: absolute; /* Positioned relative to .search-container */
+    top: 100%; /* Starts immediately below the .main-search-bar */
+    left: 0;
+    width: 100%;
+    max-height: 250px; /* Limit height for scrollability */
+    overflow-y: auto; /* Enable scrolling if many suggestions */
+    border-radius: 0 0 12px 12px; /* Rounded corners for the bottom of the list */
+    padding: 5px 0; /* Vertical padding for the list */
+    z-index: 999; /* Below the search bar itself, but above the map */
+    display: none; /* Hidden by default, shown by JS when results appear */
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Separator between items */
+    transition: background-color 0.2s ease;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none; /* No border for the last item */
+}
+
+.suggestion-item:hover,
+.suggestion-item.active { /* 'active' class can be used for keyboard navigation highlight */
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 
 /* Bottom Navigation Bar Styling */
 .bottom-nav-bar {
     position: fixed;
-    bottom: 0; /* Aligns to the very bottom */
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: calc(60px + env(safe-area-inset-bottom, 0px)); /* Height + safe area */
-    padding-bottom: env(safe-area-inset-bottom, 0px); /* Push content up from safe area */
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 
     display: flex;
-    justify-content: space-around; /* Distribute items evenly */
+    justify-content: space-around;
     align-items: center;
     
-    border-radius: 12px 12px 0 0; /* Rounded corners only at the top */
+    border-radius: 12px 12px 0 0;
     z-index: 1000;
 }
 
 .nav-item {
     display: flex;
-    flex-direction: column; /* Stack icon and text */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex: 1; /* Make items take equal width */
-    padding: 5px 0; /* Padding inside each item */
+    flex: 1;
+    padding: 5px 0;
     cursor: pointer;
-    font-size: 0.75em; /* Smaller text for nav items */
+    font-size: 0.75em;
     opacity: 0.8;
     transition: opacity 0.3s ease;
 }
@@ -111,7 +146,7 @@ body {
 
 .nav-item .material-icons {
     font-size: 24px;
-    margin-bottom: 3px; /* Space between icon and text */
+    margin-bottom: 3px;
 }
 
 
@@ -128,8 +163,8 @@ body {
     font-size: 32px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    z-index: 1001; /* Higher than other UI elements */
-    background-color: #1976D2; /* Default blue for main FAB */
+    z-index: 1001;
+    background-color: #1976D2;
 }
 
 .fab:hover {
@@ -139,9 +174,7 @@ body {
 
 /* Specific styling for the new Location FAB */
 #location-fab {
-    /* Position above the main FAB, adjusting for its height + some margin */
-    /* bottom calculation: bottom_nav_bar_height (approx 60px) + gap (20px) + fab_height (56px) + safe_area_inset_bottom (0px) = 136px */
-    bottom: calc(136px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(136px + env(safe-area-inset-bottom, 0px)); /* 60px(nav) + 20px(gap) + 56px(fab) */
     right: calc(20px + env(safe-area-inset-right, 0px));
     background-color: rgba(255, 255, 255, 0.2);
 }
@@ -151,8 +184,7 @@ body {
 }
 
 /* Position for the main + FAB */
-/* bottom calculation: bottom_nav_bar_height (approx 60px) + gap (20px) + safe_area_inset_bottom (0px) = 80px */
 .fab.main-fab {
-    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px)); /* 60px(nav) + 20px(gap) */
     right: calc(20px + env(safe-area-inset-right, 0px));
 }

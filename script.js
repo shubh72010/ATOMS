@@ -41,8 +41,6 @@ function onLocationFound(e) {
 
 function onLocationError(e) {
     console.error(e.message);
-    // You might want to display a message on the UI directly, e.g., in the bottom search bar placeholder
-    // For now, we'll just log and fall back to a default view
     console.log('Location unavailable or denied. Falling back to Delhi.');
     // Fallback to Delhi if location is not found
     map.setView([28.6139, 77.2090], 13);
@@ -61,8 +59,7 @@ if (!navigator.geolocation) {
         .bindPopup('<b>Hello world!</b><br />Geolocation not supported. Displaying Delhi.')
         .openPopup();
 } else {
-    // No longer updating info-box span directly. Just try to get location.
-    map.locate({setView: false, maxZoom: 16, watch: true, enableHighAccuracy: true}); // watch: true to continuously update
+    map.locate({setView: false, maxZoom: 16, watch: true, enableHighAccuracy: true});
 }
 
 // Event listeners for Leaflet location events
@@ -81,6 +78,3 @@ L.Routing.control({
     geocoder: L.Control.Geocoder.nominatim(),
     showAlternatives: true,
 }).addTo(map);
-
-// Removed all previous 'coordinatesSpan' and 'map.on('moveend')' logic
-// as the info box is removed.

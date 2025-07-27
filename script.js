@@ -102,7 +102,7 @@ let routeLayer = null; // To store the current route polyline
 
 // IMPORTANT: Replace 'YOUR_OPENROUTESERVICE_API_KEY' with your actual API key.
 // You can get a free API key by registering at https://openrouteservice.org/sign-up [span_3](start_span)[span_3](end_span)
-const ORS_API_KEY = 'YOUR_OPENROUTESERVICE_API_KEY';
+const ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjQzOTM3ZTJlMzA3NjRiODlhOGQ5MjgyNjlmNzA1Y2EzIiwiaCI6Im11cm11cjY0In0=';
 
 routeButton.addEventListener('click', async () => {
     const startQuery = startInput.value.trim();

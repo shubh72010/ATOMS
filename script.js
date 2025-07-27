@@ -1,4 +1,4 @@
-// Initialize the map (initially centered on a default location, will be updated by geolocation)
+// Initialize the map (initially centered on a  default location, will be updated by geolocation)
 const map = L.map('map').setView([20.5937, 78.9629], 5); // Default: Center of India, broader zoom
 
 // Add CartoDB Dark Matter tile layer for a dark theme

@@ -10,9 +10,13 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 // --- User Location Logic ---
 let userMarker; // To store the user's location marker
-let accuracyCircle; // To store the the accuracy circle
+let accuracyCircle; // To store the accuracy circle
+let lastKnownUserLocation = null; // Variable to store the user's last known LatLng
 
 function onLocationFound(e) {
+    // Store the location for later use by the button
+    lastKnownUserLocation = e.latlng;
+
     // If a previous marker/circle exists, remove them
     if (userMarker) {
         map.removeLayer(userMarker);
@@ -49,26 +53,43 @@ function onLocationError(e) {
         .openPopup();
 }
 
-// Request user's location
+// Request user's location only once on load
 if (!navigator.geolocation) {
     console.error('Geolocation is not supported by your browser');
     console.log('Geolocation not supported. Falling back to Delhi.');
-    // Fallback if geolocation is not supported
     map.setView([28.6139, 77.2090], 13);
     L.marker([28.6139, 77.2090]).addTo(map)
         .bindPopup('<b>Hello world!</b><br />Geolocation not supported. Displaying Delhi.')
         .openPopup();
 } else {
-    map.locate({setView: false, maxZoom: 16, watch: true, enableHighAccuracy: true});
+    // Only fetch location once: setView to false, watch to false (default)
+    map.locate({setView: false, maxZoom: 16, enableHighAccuracy: true});
 }
 
 // Event listeners for Leaflet location events
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
 
+// --- "Go to My Location" Button Logic ---
+const locationFabButton = document.getElementById('location-fab');
+
+if (locationFabButton) {
+    locationFabButton.addEventListener('click', () => {
+        if (lastKnownUserLocation) {
+            map.setView(lastKnownUserLocation, 15); // Go back to user's last known location
+            if (userMarker) {
+                userMarker.openPopup(); // Re-open the popup if marker exists
+            }
+        } else {
+            alert('Your location is not available. Please ensure location services are enabled.');
+            // Optionally, try to locate again
+            map.locate({setView: false, maxZoom: 16, enableHighAccuracy: true});
+        }
+    });
+}
+
+
 // --- Routing Control (from previous step) ---
-// Initialize the routing control
-// It will appear in the top-left by default.
 L.Routing.control({
     waypoints: [
         L.latLng(28.6139, 77.2090), // Default start (will be replaced by user location if found)

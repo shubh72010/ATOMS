@@ -5,8 +5,7 @@
 
 body {
     margin: 0;
-    /* Remove padding from body as top bar will handle top safe area */
-    padding: 0;
+    padding: 0; /* Map will cover full viewport, UI elements float on top */
     overflow: hidden; /* Prevent scrollbars */
     font-family: 'Roboto', Arial, sans-serif; /* A clean font, or whatever you prefer */
 }
@@ -14,7 +13,6 @@ body {
 #map {
     width: 100vw; /* 100% of viewport width */
     height: 100vh; /* 100% of viewport height */
-    /* Remove padding from map as top bar will float over it */
     padding: 0;
 }
 
@@ -22,7 +20,8 @@ body {
 
 /* Base styles for frosted elements */
 .main-search-bar,
-.fab { /* Both main search bar and FABs now share this base frosted style */
+.bottom-nav-bar, /* New: bottom nav bar gets frosted style */
+.fab {
     background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
     backdrop-filter: blur(8px);           /* The frosted effect */
     -webkit-backdrop-filter: blur(8px);   /* Safari compatibility */
@@ -30,25 +29,23 @@ body {
     color: #fff;                          /* White text */
 }
 
-
 /* Main Search Bar (Frosted and Top-positioned) */
 .main-search-bar {
-    position: fixed; /* Stays fixed at the top of the viewport */
-    top: 0;          /* Aligns to the very top edge */
+    position: fixed;
+    top: 0;
     left: 0;
-    width: 100%;     /* Spans full width */
+    width: 100%;
     
-    /* Padding for the search bar itself, pushes content down from browser UI */
     padding: calc(10px + env(safe-area-inset-top, 0px)) 15px 10px;
     
-    height: auto; /* Height will adjust based on content and padding */
-    min-height: calc(60px + env(safe-area-inset-top, 0px)); /* Minimum height */
+    height: auto;
+    min-height: calc(60px + env(safe-area-inset-top, 0px));
     
     display: flex;
     align-items: center;
 
-    border-radius: 0 0 12px 12px; /* Rounded corners only at the bottom */
-    z-index: 1000; /* Ensure it's above the map */
+    border-radius: 0 0 12px 12px;
+    z-index: 1000;
 }
 
 .main-search-bar .material-icons {
@@ -78,12 +75,52 @@ body {
 }
 
 
+/* Bottom Navigation Bar Styling */
+.bottom-nav-bar {
+    position: fixed;
+    bottom: 0; /* Aligns to the very bottom */
+    left: 0;
+    width: 100%;
+    height: calc(60px + env(safe-area-inset-bottom, 0px)); /* Height + safe area */
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* Push content up from safe area */
+
+    display: flex;
+    justify-content: space-around; /* Distribute items evenly */
+    align-items: center;
+    
+    border-radius: 12px 12px 0 0; /* Rounded corners only at the top */
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column; /* Stack icon and text */
+    align-items: center;
+    justify-content: center;
+    flex: 1; /* Make items take equal width */
+    padding: 5px 0; /* Padding inside each item */
+    cursor: pointer;
+    font-size: 0.75em; /* Smaller text for nav items */
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.nav-item:hover {
+    opacity: 1;
+}
+
+.nav-item .material-icons {
+    font-size: 24px;
+    margin-bottom: 3px; /* Space between icon and text */
+}
+
+
 /* Floating Action Buttons (FABs) Styling */
 .fab {
     position: fixed;
     width: 56px;
     height: 56px;
-    border-radius: 50%; /* Circular shape */
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -97,25 +134,25 @@ body {
 
 .fab:hover {
     background-color: #1565C0;
-    transform: translateY(-2px); /* Slight lift effect */
+    transform: translateY(-2px);
 }
 
 /* Specific styling for the new Location FAB */
 #location-fab {
     /* Position above the main FAB, adjusting for its height + some margin */
-    bottom: calc(90px + env(safe-area-inset-bottom, 0px)); /* 56px (main FAB height) + 20px (gap) + 20px (original FAB bottom) */
+    /* bottom calculation: bottom_nav_bar_height (approx 60px) + gap (20px) + fab_height (56px) + safe_area_inset_bottom (0px) = 136px */
+    bottom: calc(136px + env(safe-area-inset-bottom, 0px));
     right: calc(20px + env(safe-area-inset-right, 0px));
-    /* Make it slightly different to differentiate */
-    background-color: rgba(255, 255, 255, 0.2); /* Lighter frosted background */
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 #location-fab:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Position for the main FAB */
-/* This rule targets the FAB without an ID, ensuring it's the bottom-most */
-.fab:not(#location-fab) { 
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+/* Position for the main + FAB */
+/* bottom calculation: bottom_nav_bar_height (approx 60px) + gap (20px) + safe_area_inset_bottom (0px) = 80px */
+.fab.main-fab {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
     right: calc(20px + env(safe-area-inset-right, 0px));
 }

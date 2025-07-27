@@ -1,18 +1,121 @@
-/* Styling for the new Location FAB */
+/* Universal box-sizing for easier layout */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    /* Remove padding from body as top bar will handle top safe area */
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
+    font-family: 'Roboto', Arial, sans-serif; /* A clean font, or whatever you prefer */
+}
+
+#map {
+    width: 100vw; /* 100% of viewport width */
+    height: 100vh; /* 100% of viewport height */
+    /* Remove padding from map as top bar will float over it */
+    padding: 0;
+}
+
+/* --- Frosted UI Elements --- */
+
+/* Base styles for frosted elements */
+.main-search-bar,
+.fab { /* Both main search bar and FABs now share this base frosted style */
+    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
+    backdrop-filter: blur(8px);           /* The frosted effect */
+    -webkit-backdrop-filter: blur(8px);   /* Safari compatibility */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    color: #fff;                          /* White text */
+}
+
+
+/* Main Search Bar (Frosted and Top-positioned) */
+.main-search-bar {
+    position: fixed; /* Stays fixed at the top of the viewport */
+    top: 0;          /* Aligns to the very top edge */
+    left: 0;
+    width: 100%;     /* Spans full width */
+    
+    /* Padding for the search bar itself, pushes content down from browser UI */
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 15px 10px;
+    
+    height: auto; /* Height will adjust based on content and padding */
+    min-height: calc(60px + env(safe-area-inset-top, 0px)); /* Minimum height */
+    
+    display: flex;
+    align-items: center;
+
+    border-radius: 0 0 12px 12px; /* Rounded corners only at the bottom */
+    z-index: 1000; /* Ensure it's above the map */
+}
+
+.main-search-bar .material-icons {
+    font-size: 24px;
+    cursor: pointer;
+    margin: 0 5px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.main-search-bar .material-icons:hover {
+    opacity: 1;
+}
+
+.main-search-bar input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 0 10px;
+    font-size: 1.1em;
+    outline: none;
+}
+
+.main-search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+
+/* Floating Action Buttons (FABs) Styling */
+.fab {
+    position: fixed;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%; /* Circular shape */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 32px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    z-index: 1001; /* Higher than other UI elements */
+    background-color: #1976D2; /* Default blue for main FAB */
+}
+
+.fab:hover {
+    background-color: #1565C0;
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Specific styling for the new Location FAB */
 #location-fab {
     /* Position above the main FAB, adjusting for its height + some margin */
     bottom: calc(90px + env(safe-area-inset-bottom, 0px)); /* 56px (main FAB height) + 20px (gap) + 20px (original FAB bottom) */
     right: calc(20px + env(safe-area-inset-right, 0px));
-    /* Make it slightly smaller or change color if desired to differentiate */
+    /* Make it slightly different to differentiate */
     background-color: rgba(255, 255, 255, 0.2); /* Lighter frosted background */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Match other frosted elements */
 }
 
 #location-fab:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Ensure the main FAB also respects the spacing from the new button */
-.fab {
+/* Position for the main FAB */
+/* This rule targets the FAB without an ID, ensuring it's the bottom-most */
+.fab:not(#location-fab) { 
     bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
 }

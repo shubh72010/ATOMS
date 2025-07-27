@@ -1,0 +1,41 @@
+/* Existing CSS for body and map */
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#map {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Frosted UI Look for Info Box */
+#info-box {
+    position: absolute; /* Position it relative to the viewport */
+    top: 20px;          /* 20px from the top */
+    right: 20px;        /* 20px from the right */
+    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
+    backdrop-filter: blur(8px); /* The magic! Adjust blur value as desired */
+    -webkit-backdrop-filter: blur(8px); /* For Safari compatibility */
+    color: #fff;       /* White text color for contrast */
+    padding: 15px 20px; /* Padding inside the box */
+    border-radius: 10px; /* Slightly rounded corners */
+    z-index: 1000;      /* Ensure it's above the map */
+    font-family: Arial, sans-serif; /* Basic font styling */
+    max-width: 250px;   /* Limit width so it doesn't cover too much map */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+#info-box h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Subtle separator */
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+#info-box p {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}

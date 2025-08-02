@@ -2,62 +2,313 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>My Free Map App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nothing OS Atmosphere Image Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic Resets & Global Styles */
+        :root {
+            --bg-color-dark: #1a1a1a;
+            --container-bg: #2a2a2a;
+            --text-light: #e0e0e0;
+            --text-lighter: #ffffff;
+            --accent-color: #ffffff; /* White accents for interactive elements */
+            --border-color: #3a3a3a;
+        }
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+        h1 {
+            color: var(--text-lighter);
+            margin-bottom: 30px;
+            text-align: center;
+        }
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        /* Container Styling */
+        .container {
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            box-sizing: border-box;
+        }
 
-    <link rel="stylesheet" href="style.css">
+        /* Input Section (Upload & Canvas) */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--accent-color);
+            color: var(--bg-color-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-file-upload:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        .custom-file-upload:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        #imageUpload {
+            display: none; /* Hide the actual file input */
+        }
+
+        #mainCanvas {
+            background-color: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+            display: block; /* Remove extra space below canvas */
+        }
+
+        /* Loading Spinner */
+        #loadingSpinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Controls Section */
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .control-group {
+            background-color: #333333;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #444;
+        }
+
+        .control-group label {
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+
+        .control-group span {
+            color: var(--accent-color);
+            min-width: 40px; /* Ensure value display has enough space */
+            text-align: right;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #555;
+            outline: none;
+            border-radius: 5px;
+            transition: opacity .2s;
+            margin-top: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 25px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 4px;
+            vertical-align: middle;
+            padding: 0;
+            margin-left: auto; /* Push to the right */
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        input[type="color"]::-moz-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-moz-color-swatch {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+
+        /* Download Button */
+        #downloadBtn {
+            display: block;
+            width: fit-content;
+            margin: 0 auto;
+            padding: 12px 30px;
+            background-color: var(--accent-color);
+            color: var(--bg-color-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-decoration: none; /* For download link functionality */
+            text-align: center;
+        }
+
+        #downloadBtn:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        #downloadBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            .controls-section {
+                grid-template-columns: 1fr; /* Stack controls on small screens */
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="map"></div>
+    <h1>Nothing OS Atmosphere Image Converter</h1>
 
-    <div class="search-container">
-        <div class="main-search-bar">
-            <span class="material-icons">search</span> <input type="text" placeholder="Search here...">
-            <span class="material-icons">mic</span> </div>
-        <div class="search-suggestions">
+    <div class="container">
+        <div class="input-section">
+            <label for="imageUpload" class="custom-file-upload">Click to Upload Image</label>
+            <input type="file" id="imageUpload" accept="image/*">
+            <canvas id="mainCanvas"></canvas>
+            <div id="loadingSpinner"></div>
+            <button id="loadPresetBtn" class="custom-file-upload">Load "Atmosphere" Preset</button>
+        </div>
+
+        <div class="controls-section">
+            <div class="control-group">
+                <label for="blurRadius">Blur Radius: <span id="blurValue">10</span></label>
+                <input type="range" id="blurRadius" min="0" max="50" value="10">
             </div>
+
+            <div class="control-group">
+                <label for="saturation">Saturation: <span id="saturationValue">100%</span></label>
+                <input type="range" id="saturation" min="0" max="200" value="100">
+            </div>
+
+            <div class="control-group">
+                <label for="tintOpacity">Tint Opacity: <span id="tintOpacityValue">20%</span></label>
+                <input type="range" id="tintOpacity" min="0" max="100" value="20">
+            </div>
+
+            <div class="control-group">
+                <label for="tintColor">Tint Color:</label>
+                <input type="color" id="tintColor" value="#000000">
+            </div>
+
+            <div class="control-group">
+                <label for="noiseIntensity">Noise Intensity: <span id="noiseValue">0</span></label>
+                <input type="range" id="noiseIntensity" min="0" max="100" value="0">
+            </div>
+
+            <div class="control-group">
+                <label for="distortionAmplitude">Distortion Amplitude: <span id="distortionAmplitudeValue">0</span></label>
+                <input type="range" id="distortionAmplitude" min="0" max="50" value="0">
+            </div>
+
+            <div class="control-group">
+                <label for="distortionFrequency">Distortion Frequency: <span id="distortionFrequencyValue">10</span></label>
+                <input type="range" id="distortionFrequency" min="1" max="100" value="10">
+            </div>
+
+        </div>
+
+        <button id="downloadBtn">Download Image</button>
     </div>
 
-    <div class="fab main-fab">
-        <span class="material-icons">add</span>
-    </div>
-
-    <div id="location-fab" class="fab">
-        <span class="material-icons">my_location</span>
-    </div>
-
-    <div class="bottom-nav-bar">
-        <div class="nav-item">
-            <span class="material-icons">explore</span>
-            <span>Explore</span>
-        </div>
-        <div class="nav-item">
-            <span class="material-icons">bookmark</span>
-            <span>Saved</span>
-        </div>
-        <div class="nav-item">
-            <span class="material-icons">person</span>
-            <span>You</span>
-        </div>
-        <div class="nav-item">
-            <span class="material-icons">add_location</span>
-            <span>Contribute</span>
-        </div>
-    </div>
-
-
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-
-    <script src="https://unpkg.com/lrm-openrouteservice/dist/lrm-openrouteservice.js"></script>
-
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/flozz/StackBlur@master/dist/stackblur.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
